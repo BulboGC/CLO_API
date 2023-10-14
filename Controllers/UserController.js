@@ -1,5 +1,5 @@
-const {createUser,uniqueEmail,deleteUser, updateUser,listUser} = require('../Services/UserService')
-const {authenticateUser} = require('../Services/authService');
+const {createUser,uniqueEmail,deleteUser, updateUser,listUser,findUserbyEmail} = require('../Services/UserService')
+const {authenticateUser,generateRecoveryToken} = require('../Services/authService');
 
 
 require('dotenv').config();
@@ -93,8 +93,31 @@ const dellUser = async(req,res)=>{
   
 
 }
-
-
+const recoveryToken = async (req, res) => {
   
+
+const { email } = req.body;
+
+  try {
+    // Verifique se o e-mail fornecido corresponde a um usuário
+    const user = await findUserbyEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ message: 'E-mail não encontrado' });
+    }
+
+    // Crie um token de recuperação de conta
+    const recoveryToken = generateRecoveryToken(user);
+
+    // Envie o token para o e-mail do usuário
+    sendRecoveryTokenByEmail(user.email, recoveryToken);
+
+    // Responda com uma mensagem de sucesso
+    res.json({ message: 'Token de recuperação enviado com sucesso' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erro ao processar a solicitação de recuperação de conta' });
+  }
+}
 
   module.exports = { addUser,login,dellUser,editUser,getUser}; // Exportar os Metodos de controle

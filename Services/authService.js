@@ -1,6 +1,7 @@
 const User = require('../Models/UserModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const authenticateUser = async (email, password) => {
     try {
@@ -16,21 +17,32 @@ const authenticateUser = async (email, password) => {
             throw new Error('Credenciais inválidas');
         }
 
-        const payload = {
-            id: user._id,
-        };
-
-        const JWT_SECRET = process.env.JWT_SECRET;
-        const token = jwt.sign(payload, JWT_SECRET);
-
+        const token = generateRecoveryToken(user);
         return token;
     } catch (err) {
         throw err;
     }
 };
 
+
+
+const generateRecoveryToken = (user) => {
+    const payload = {
+      id: user._id,
+      
+    };
+  
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '5m' }); 
+  
+    return token;
+  };
+
+
+  
+
 const verifyHashPass = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
 };
 
-module.exports = { authenticateUser,verifyHashPass };
+module.exports = { authenticateUser,verifyHashPass,generateRecoveryToken };

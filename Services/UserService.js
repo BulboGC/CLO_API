@@ -88,6 +88,10 @@ const findUser = async (id)=>{
     const response = await User.findOne({ _id: id });
     return response
 }
+const findUserbyEmail = async (email)=>{
+    const response = await User.findOne({ email: email });
+    return response
+}
 
 
 const createUser = async ( name,password, email,role) => {
@@ -124,4 +128,4 @@ const createUser = async ( name,password, email,role) => {
 
 };
 
-module.exports = { createUser,findUser,uniqueEmail,deleteUser,updateUser,listUser};
+module.exports = { createUser,findUser,uniqueEmail,deleteUser,updateUser,listUser,findUserbyEmail};
