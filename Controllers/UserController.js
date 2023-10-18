@@ -1,5 +1,7 @@
-const {createUser,uniqueEmail,deleteUser, updateUser,listUser,findUserbyEmail} = require('../Services/UserService')
-const {authenticateUser,generateRecoveryToken} = require('../Services/authService');
+const {createUser,uniqueEmail,deleteUser, updateUser,listUser,findUserbyEmail,changePassword} = require('../Services/UserService');
+const {authenticateUser,generateRecoveryToken,verifyTokenAndGetUserId} = require('../Services/authService');
+const {sendRecoveryTokenByEmail} = require('../Services/emailService');
+
 
 
 require('dotenv').config();
@@ -99,7 +101,7 @@ const recoveryToken = async (req, res) => {
 const { email } = req.body;
 
   try {
-    // Verifique se o e-mail fornecido corresponde a um usuário
+    
     const user = await findUserbyEmail(email);
 
     if (!user) {
@@ -107,17 +109,39 @@ const { email } = req.body;
     }
 
     // Crie um token de recuperação de conta
-    const recoveryToken = generateRecoveryToken(user);
+    const recoveryToken = await generateRecoveryToken(user);
 
     // Envie o token para o e-mail do usuário
-    sendRecoveryTokenByEmail(user.email, recoveryToken);
+    await sendRecoveryTokenByEmail(user.email, recoveryToken);
 
     // Responda com uma mensagem de sucesso
-    res.json({ message: 'Token de recuperação enviado com sucesso' });
+    res.status(200).json({ message: 'Token de recuperação enviado com sucesso' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao processar a solicitação de recuperação de conta' });
   }
 }
 
-  module.exports = { addUser,login,dellUser,editUser,getUser}; // Exportar os Metodos de controle
+const changeForgotPassword = async (req, res) => {
+  const {token} = req.body;
+  const { password } = req.body;
+
+  try {
+    const userid = await verifyTokenAndGetUserId(token);
+    if(userid === null){
+      res.status(400).send({message:'Token invalido'});
+    }
+   
+    const updatedUser = await changePassword(user, password);
+    res.status(200).send({message:'Senha alterada com sucesso'});
+
+
+    
+  }catch(err){
+    res.status(400).send({message:err.message});
+  }
+
+
+}
+
+  module.exports = { addUser,login,dellUser,editUser,getUser,recoveryToken,changeForgotPassword}; 

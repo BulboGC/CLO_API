@@ -2,6 +2,7 @@ const User = require('../Models/UserModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const authenticateUser = async (email, password) => {
     try {
@@ -32,10 +33,28 @@ const generateRecoveryToken = (user) => {
       
     };
   
-    const JWT_SECRET = process.env.JWT_SECRET;
+
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '5m' }); 
   
     return token;
+
+
+
+    
+  };
+
+
+  const verifyTokenAndGetUserId = (token) => {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      // Verifique se o token contém o ID do usuário
+      if (decoded && decoded.userId) {
+        return decoded.userId;
+      }
+    } catch (error) {
+      throw new error ('Erro na decodificação do JWT:', error);
+    }
+    return false;
   };
 
 
@@ -45,4 +64,4 @@ const verifyHashPass = async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
 };
 
-module.exports = { authenticateUser,verifyHashPass,generateRecoveryToken };
+module.exports = { authenticateUser,verifyHashPass,generateRecoveryToken ,verifyTokenAndGetUserId};

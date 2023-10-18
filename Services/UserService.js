@@ -93,6 +93,18 @@ const findUserbyEmail = async (email)=>{
     return response
 }
 
+const changePassword = async (userid,password)=>{
+
+    try{
+        const user = await User.findById(userid);
+        const hashRounds = parseInt(process.env.BCRYPT_HASH_ROUNDS);
+        const hashedPassword = await bcrypt.hash(password, hashRounds);
+        user.password = hashedPassword;
+        await user.save();
+    }catch(err){
+        throw err
+    }
+}
 
 const createUser = async ( name,password, email,role) => {
     
@@ -128,4 +140,4 @@ const createUser = async ( name,password, email,role) => {
 
 };
 
-module.exports = { createUser,findUser,uniqueEmail,deleteUser,updateUser,listUser,findUserbyEmail};
+module.exports = { createUser,findUser,uniqueEmail,deleteUser,updateUser,listUser,findUserbyEmail,changePassword};

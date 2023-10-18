@@ -40,6 +40,23 @@ const ProtectRoute = async (req, res, next) => {
 };
 
 
+const verifytoken = async (token) => {
+  try {
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const tokenok = await token.split(' ')[1]        
+    const decoded = await jwt.verify(tokenok, JWT_SECRET,{
+        expiresIn: '24h' 
+
+         });
+    req.user = decoded;
+
+  } catch (err) {
+    console.error('Erro na decodificação do JWT:', err);
+    return res.status(401).json({status:401, mensagem: 'Token inválido' });
+  }
+}
+
+
 
 
 
