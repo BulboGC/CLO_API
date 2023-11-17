@@ -6,6 +6,7 @@ const router = express.Router();
 // controladores
 const { addUser, login, dellUser ,editUser,getUser,recoveryToken,changeForgotPassword} = require('../../Controllers/UserController');
 const { getTasks, addTask, deleteTask, editTask } = require('../../Controllers/TaskController');
+const { addQuest, softdellQuest,editQuest,defautQuest } = require('../../Controllers/QuestController');
 
 //middlewares
 const { ProtectRoute } = require('../../Middlewares/jwt');
@@ -22,6 +23,15 @@ router.post('/changepassword',changeForgotPassword);
 router.delete('/user',ProtectRoute,dellUser);
 router.put('/user',ProtectRoute,editUser);
 router.get('/user',ProtectRoute,getUser);
+
+/* Rotas de Quest */
+router.delete('/quest/:id',ProtectRoute,softdellQuest);
+router.post('/quest',ProtectRoute,addQuest);
+router.put('/quest/:id',ProtectRoute,editQuest);
+router.post('/initquest',defautQuest);
+
+
+
 
 
 

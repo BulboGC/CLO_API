@@ -44,6 +44,24 @@ const generateRecoveryToken = (user) => {
   };
 
 
+  const generateToken = (user,timeNumber,timeType) => {
+    if(timeNumber =  NaN ){
+      throw new Error('timeNumber invalido')
+    }
+    if(timeType !=  'm','h','s'){ 
+      throw new Error('timeType invalido')
+    }
+
+
+    const payload = {
+      id: user._id,
+    };
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: time });
+    return token
+
+  }
+
+
   const verifyTokenAndGetUserId = (token) => {
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
